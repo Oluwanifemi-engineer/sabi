@@ -65,6 +65,14 @@ export default function Home() {
   const [speaking, setSpeaking] = useState(false);
   const [simpler, setSimpler] = useState<{ headline: string; bullets: string[]; aboutWrong: string[] } | null>(null);
   const [simplifyLoading, setSimplifyLoading] = useState(false);
+  /** Which missed questions the current simpler tier was written for. */
+  const [simplerFor, setSimplerFor] = useState("");
+  /**
+   * Attempts at THIS letter's comprehension check. Kept outside quizResult
+   * because a retry clears the result; the receipt must still report how many
+   * tries the check actually took.
+   */
+  const [quizAttempts, setQuizAttempts] = useState(0);
   const [finalAck, setFinalAck] = useState<Acknowledgment | null>(null);
 
   const engineBadge = useMemo(() => {
@@ -103,6 +111,8 @@ export default function Home() {
       setQuizResult(null);
       setRevealed(false);
       setSimpler(null);
+      setSimplerFor("");
+      setQuizAttempts(0);
       setStep(1);
     } catch (e) {
       setError(e instanceof Error ? e.message : UI[language].errGeneric);
@@ -119,7 +129,9 @@ export default function Home() {
       if (answers[i] !== q.correctIndex) wrong.push(i);
     });
     const passed = wrong.length === 0;
-    const resultData: QuizResult = { passed, attempts: (quizResult?.attempts ?? 0) + 1, wrong };
+    const attemptNo = quizAttempts + 1;
+    setQuizAttempts(attemptNo);
+    const resultData: QuizResult = { passed, attempts: attemptNo, wrong };
     setQuizResult(resultData);
     setRevealed(true);
     if (passed) {
@@ -141,13 +153,16 @@ export default function Home() {
     setAnswers([null, null, null]);
     setQuizResult(null);
     setRevealed(false);
-    // Fetch the simplified re-explanation once, based on what was missed.
-    if (!simpler && result) {
+    // Fetch the simplified re-explanation for what was missed. Refetch only when
+    // the missed questions change, so a second attempt that misses something new
+    // gets an explanation of the right things.
+    const failedTexts = wrongIndices
+      .map((i) => result?.questions[i]?.question)
+      .filter((q): q is string => Boolean(q));
+    const failedKey = failedTexts.join(" | ");
+    if (result && failedKey && failedKey !== simplerFor) {
       setSimplifyLoading(true);
       try {
-        const failedTexts = wrongIndices
-          .map((i) => result.questions[i]?.question)
-          .filter((q): q is string => Boolean(q));
         const res = await fetch("/api/simplify", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -161,6 +176,7 @@ export default function Home() {
         });
         const data = (await res.json()) as { simpler?: { headline: string; bullets: string[]; aboutWrong: string[] } };
         setSimpler(data.simpler ?? null);
+        setSimplerFor(failedKey);
       } catch {
         setSimpler(null);
       } finally {
@@ -390,7 +406,7 @@ export default function Home() {
           <div className="card p-6 fade-in" dir={rtl}>
             <div className="flex items-center justify-between mb-3">
               <span className="rounded-full px-3 py-1 text-xs font-bold text-white" style={{ background: "var(--teal)" }}>
-                {result.analysis.type.toUpperCase()}
+                {(t.letterTypes[result.analysis.type] ?? result.analysis.type).toUpperCase()}
               </span>
               {engineBadge && <span className="text-xs opacity-50">{t.demoEngine}</span>}
             </div>
@@ -489,6 +505,33 @@ export default function Home() {
           <div className="card p-6" dir={rtl}>
             <h2 className="font-display text-2xl font-bold mb-1">{t.quizTitle}</h2>
             <p className="opacity-60 mb-4">{t.quizSub}</p>
+            {(simplifyLoading || simpler) && (
+              <div
+                className="rounded-xl p-4 mb-5 fade-in"
+                style={{ background: "color-mix(in srgb, var(--teal) 10%, white)" }}
+              >
+                <p className="font-bold mb-2">{t.simplerTitle}</p>
+                {simplifyLoading ? (
+                  <p className="opacity-60">{t.simplerLoading}</p>
+                ) : (
+                  simpler && (
+                    <>
+                      <p className="font-semibold mb-1">{simpler.headline}</p>
+                      <ul className="list-disc pl-5 space-y-0.5 mb-2">
+                        {simpler.bullets.map((b, i) => (
+                          <li key={i}>{b}</li>
+                        ))}
+                      </ul>
+                      {simpler.aboutWrong.map((w, i) => (
+                        <p key={i} className="text-sm opacity-75">
+                          {w}
+                        </p>
+                      ))}
+                    </>
+                  )
+                )}
+              </div>
+            )}
             {result.questions.map((q, qi) => (
               <div key={qi} className="mb-5">
                 <p className="font-bold mb-2">
@@ -549,29 +592,6 @@ export default function Home() {
                   {t.explainAgain}
                 </button>
               </div>
-              {(simplifyLoading || simpler) && (
-                <div className="mt-4 text-left rounded-xl p-4 fade-in bg-white" dir={rtl}>
-                  {simplifyLoading ? (
-                    <p className="opacity-60">{t.simplerLoading}</p>
-                  ) : (
-                    simpler && (
-                      <>
-                        <p className="font-bold mb-1">{simpler.headline}</p>
-                        <ul className="list-disc pl-5 space-y-0.5 mb-2">
-                          {simpler.bullets.map((b, i) => (
-                            <li key={i}>{b}</li>
-                          ))}
-                        </ul>
-                        {simpler.aboutWrong.map((w, i) => (
-                          <p key={i} className="text-sm opacity-75">
-                            {w}
-                          </p>
-                        ))}
-                      </>
-                    )
-                  )}
-                </div>
-              )}
             </div>
           ) : (
             <button type="button" className="btn-primary w-full" onClick={gradeQuiz} disabled={answers.some((a) => a === null)}>
