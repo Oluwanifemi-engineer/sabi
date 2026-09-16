@@ -83,7 +83,9 @@ Open **http://localhost:4317** — the demo engine works immediately, no key nee
 cp .env.example .env.local   # set LLM_API_KEY (any OpenAI-compatible provider)
 ```
 
-Optional: `LLM_VISION_MODEL` if your provider needs a different model name for photo OCR.
+`LLM_VISION_MODEL` enables live photo OCR and must be set explicitly — a text-only model cannot read a photo, so without it photo intake serves a sample extraction rather than failing on every request. Verify the model id against your provider's list first; guessing one returns errors on every call.
+
+Whatever you configure, a failing or exhausted model never breaks the app: the text pipeline degrades to the demo engine (`engine: "demo-fallback"`), so the flow stays usable.
 
 ---
 

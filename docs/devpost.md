@@ -114,6 +114,6 @@ Language access is **civil-rights infrastructure**, not a translation feature. T
 [Your name] — [Your role(s)]
 
 ## Links
-- **Live demo: https://sabi-teal.vercel.app** — runs in demo mode with zero setup; tap a sample letter and go
-- GitHub: [URL]
+- **Live demo: https://sabi-teal.vercel.app** — running the live model; tap a sample letter and go. If the model is unavailable it degrades to the built-in demo engine instead of erroring.
+- GitHub: https://github.com/Oluwanifemi-engineer/sabi
 - Video: [URL]
