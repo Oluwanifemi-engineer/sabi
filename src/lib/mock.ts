@@ -1,4 +1,4 @@
-import type { Analysis, Explanation, LanguageCode, QuizQuestion } from "./types";
+import type { Analysis, Explanation, QuizQuestion } from "./types";
 import type { AnalyzeOutput } from "./prompts";
 
 /**

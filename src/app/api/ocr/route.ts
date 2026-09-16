@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { SAMPLE_LETTERS } from "@/lib/samples";
-import { clientFromEnv, type LlmMessage } from "@/lib/llm";
+import { clientFromEnv } from "@/lib/llm";
 
 export const runtime = "nodejs";
 
@@ -39,19 +39,8 @@ export async function POST(request: Request) {
     }
 
     // ── Live mode: send image to a vision-capable LLM ─────────────────
-    const messages: LlmMessage[] = [
-      { role: "system", content: OCR_SYSTEM },
-      {
-        role: "user",
-        content: [
-          { type: "text", text: "Extract the full text from this school letter:" },
-          { type: "image_url", image_url: { url: body.image } },
-        ] as unknown as string, // LlmMessage.content is string but OpenAI API accepts array
-      },
-    ];
-
-    // Build the request manually since our minimal client only sends strings.
-    // We reuse the same env vars and endpoint — just with the multimodal payload.
+    // The minimal client in lib/llm.ts only sends string content, so the
+    // multimodal payload is built by hand here — same env vars, same endpoint.
     const apiKey = process.env.LLM_API_KEY;
     const baseUrl = (process.env.LLM_BASE_URL ?? "https://api.openai.com/v1").replace(/\/$/, "");
     const model = process.env.LLM_VISION_MODEL ?? process.env.LLM_MODEL ?? "gpt-4o-mini";

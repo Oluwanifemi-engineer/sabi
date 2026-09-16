@@ -1,9 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import SignaturePad from "@/components/SignaturePad";
 import { openReceipt } from "@/components/Receipt";
-import { newId, listLetters, saveLetter, updateLetter } from "@/lib/store";
+import {
+  folderSnapshot,
+  newId,
+  saveLetter,
+  serverFolderSnapshot,
+  subscribeFolder,
+} from "@/lib/store";
 import { speak, stopSpeaking } from "@/lib/speech";
 import PhotoIntake from "@/components/PhotoIntake";
 import { UI } from "@/lib/ui-strings";
@@ -30,7 +36,9 @@ interface AnalyzeResponse {
 
 export default function Home() {
   const [step, setStep] = useState<Step>(0);
-  const [folder, setFolder] = useState<LetterRecord[]>([]);
+  // Family folder lives in localStorage (an external store), so it is read
+  // through useSyncExternalStore rather than mirrored into component state.
+  const folder = useSyncExternalStore(subscribeFolder, folderSnapshot, serverFolderSnapshot);
   const [currentId, setCurrentId] = useState<string | null>(null);
 
   // Intake
@@ -58,18 +66,6 @@ export default function Home() {
   const [simpler, setSimpler] = useState<{ headline: string; bullets: string[]; aboutWrong: string[] } | null>(null);
   const [simplifyLoading, setSimplifyLoading] = useState(false);
   const [finalAck, setFinalAck] = useState<Acknowledgment | null>(null);
-
-  const folderRef = useRef(folder);
-  folderRef.current = folder;
-
-  useEffect(() => {
-    setFolder(listLetters());
-    function onStorage() {
-      setFolder(listLetters());
-    }
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
 
   const engineBadge = useMemo(() => {
     if (!result) return null;
@@ -212,7 +208,6 @@ export default function Home() {
     };
     setFinalAck(record.acknowledgment ?? null);
     saveLetter(record);
-    setFolder(listLetters());
     setStep(4);
   }
 
