@@ -407,6 +407,12 @@ export default function Home() {
               {error}
             </p>
           )}
+          {/* In-product data disclosure. The marketing claim and the behavior
+              must match: with a live key, letter text goes to the AI provider
+              to be explained; the folder itself stays in this browser. */}
+          <p className="text-xs opacity-60 leading-relaxed">
+            {t.privacyNote}
+          </p>
           <button type="button" className="btn-primary w-full" onClick={analyze} disabled={loading}>
             {loading ? (loadStage === 0 ? t.stage1 : loadStage === 1 ? t.stage2 : t.stage3) : t.explainBtn}
           </button>

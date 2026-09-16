@@ -6,7 +6,10 @@
     "dev": "next dev -p 4317",
     "build": "next build",
     "start": "next start -p 4317",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node --experimental-strip-types --test --test-reporter=tap tests/unit/*.test.ts",
+    "test:api": "node --experimental-strip-types --test --test-reporter=tap tests/api.test.mjs",
+    "test:e2e": "node --test --test-timeout=90000 --test-reporter=tap tests/e2e.test.mjs"
   },
   "dependencies": {
     "next": "16.3.5",

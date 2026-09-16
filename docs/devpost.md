@@ -71,7 +71,7 @@ That receipt is the artifact that did not previously exist. It is proof of *info
 - **Parent-side, zero-adoption.** No SIS integration, no district procurement cycle. Works today, from a phone, on paper letters.
 - **Truly multilingual, top to bottom.** Not just the explanation — the **entire interface** flips (Español, Français, Português, العربية, English) with correct **RTL layout** for Arabic. A parent who reads no English never sees a single English word.
 - **Bilingual receipt.** A confirmation note in the parent's language, and the record itself in English for the school — one document that serves both parties.
-- **Privacy as a feature.** No database. Letters and signatures stay on the family's device, with one-tap JSON export. No breach surface, no third-party access to a child's special-education record.
+- **Privacy-first by design.** No account and no database: signed receipts and the family folder live only in the family's browser, with one-tap JSON export — nothing to breach on our side. When the live model is on, letter text is sent to the AI provider to generate the explanation and is not stored by Sabi; the app says so plainly on the intake screen, and the built-in demo samples never leave the device.
 
 ---
 

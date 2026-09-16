@@ -49,7 +49,7 @@ Eleven years after Dearborn, Douglas County was resolving a complaint over the s
 - **The re-explanation loop.** Fail → auto-simplify → re-explain → retry. This loop is the product.
 - **Fully multilingual interface.** Not just the explanation — the whole UI flips (Español · Français · Português · العربية · English) with correct **RTL** for Arabic. A parent who reads no English never sees English.
 - **Voice-first.** Reading is the barrier — so the explanation speaks.
-- **Privacy as a feature.** No database; letters stay on the device, with one-tap JSON export.
+- **Privacy-first by design.** No account, no database: signed receipts and the family folder live in the browser, with one-tap JSON export. With a live model configured, letter text is sent to that AI provider to be explained and is not stored by Sabi — disclosed in-product; the demo samples never leave the device.
 
 ---
 
@@ -69,6 +69,20 @@ Eleven years after Dearborn, Douglas County was resolving a complaint over the s
 ## Live demo
 
 **https://sabi-teal.vercel.app** — no setup, no key. Tap a sample letter and walk the full loop.
+
+## Tests
+
+40 automated tests, zero test dependencies (Node's built-in runner + headless Chrome):
+
+```bash
+npm test          # 17 unit tests — pipeline contract, JSON extraction, full UI-translation coverage
+npm run test:api  # 12 API tests — boots a real server in demo mode; malformed input never 500s
+npm run test:e2e  # 11 browser tests — the full money path: fail → simpler tier → retry → sign → receipt
+```
+
+The e2e suite skips itself cleanly on machines without Chrome, and the API/e2e
+servers always run in demo mode regardless of your local `.env.local`, so the
+suites are deterministic and free.
 
 ## Run it locally
 

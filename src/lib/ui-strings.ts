@@ -10,7 +10,6 @@ const en = {
   tagline: "Understand before you sign.",
   steps: ["Letter", "Understand", "Check", "Sign", "Done"],
   folder: "Family folder",
-  folderEmptyHint: "",
 
   // Intake
   intakeTitle: "1. What did the school send?",
@@ -30,6 +29,8 @@ const en = {
   photoErrRead: "Could not read the letter.",
   photoErrGeneric: "Something went wrong.",
   explainBtn: "Explain this letter →",
+  privacyNote:
+    "Your signed receipts and family folder stay in this browser — no account, no database. To explain a letter, its text is sent to an AI service and is not stored by Sabi. Use the demo samples if you prefer nothing leaves your device.",
   stage1: "Reading the letter…",
   stage2: "Preparing your explanation…",
   stage3: "Almost ready…",
@@ -96,7 +97,6 @@ const es: UiStrings = {
   tagline: "Entienda antes de firmar.",
   steps: ["Carta", "Entender", "Revisar", "Firmar", "Listo"],
   folder: "Carpeta familiar",
-  folderEmptyHint: "",
   intakeTitle: "1. ¿Qué envió la escuela?",
   schoolName: "Nombre de la escuela",
   schoolNamePh: "ej. Escuela Secundaria Lincoln",
@@ -114,6 +114,8 @@ const es: UiStrings = {
   photoErrRead: "No pudimos leer la carta.",
   photoErrGeneric: "Algo salió mal.",
   explainBtn: "Explicar esta carta →",
+  privacyNote:
+    "Sus recibos firmados y su carpeta familiar se quedan en este navegador — sin cuenta ni base de datos. Para explicar una carta, su texto se envía a un servicio de IA y Sabi no lo guarda. Use las cartas de ejemplo si prefiere que nada salga de su dispositivo.",
   stage1: "Leyendo la carta…",
   stage2: "Preparando su explicación…",
   stage3: "Casi listo…",
@@ -170,7 +172,6 @@ const fr: UiStrings = {
   tagline: "Comprendre avant de signer.",
   steps: ["Lettre", "Comprendre", "Vérifier", "Signer", "Terminé"],
   folder: "Dossier familial",
-  folderEmptyHint: "",
   intakeTitle: "1. Qu'a envoyé l'école ?",
   schoolName: "Nom de l'école",
   schoolNamePh: "ex. Collège Lincoln",
@@ -188,6 +189,8 @@ const fr: UiStrings = {
   photoErrRead: "Nous n'avons pas pu lire la lettre.",
   photoErrGeneric: "Une erreur est survenue.",
   explainBtn: "Expliquer cette lettre →",
+  privacyNote:
+    "Vos reçus signés et votre dossier familial restent dans ce navigateur — sans compte ni base de données. Pour expliquer une lettre, son texte est envoyé à un service d'IA et n'est pas conservé par Sabi. Utilisez les lettres d'exemple pour que rien ne quitte votre appareil.",
   stage1: "Lecture de la lettre…",
   stage2: "Préparation de l'explication…",
   stage3: "Presque prêt…",
@@ -244,7 +247,6 @@ const pt: UiStrings = {
   tagline: "Entenda antes de assinar.",
   steps: ["Carta", "Entender", "Conferir", "Assinar", "Pronto"],
   folder: "Pasta da família",
-  folderEmptyHint: "",
   intakeTitle: "1. O que a escola enviou?",
   schoolName: "Nome da escola",
   schoolNamePh: "ex. Escola Municipal Lincoln",
@@ -262,6 +264,8 @@ const pt: UiStrings = {
   photoErrRead: "Não conseguimos ler a carta.",
   photoErrGeneric: "Algo deu errado.",
   explainBtn: "Explicar esta carta →",
+  privacyNote:
+    "Seus recibos assinados e sua pasta familiar ficam neste navegador — sem conta e sem banco de dados. Para explicar uma carta, o texto é enviado a um serviço de IA e não é guardado pelo Sabi. Use as cartas de exemplo se preferir que nada saia do seu dispositivo.",
   stage1: "Lendo a carta…",
   stage2: "Preparando sua explicação…",
   stage3: "Quase pronto…",
@@ -318,7 +322,6 @@ const ar: UiStrings = {
   tagline: "افهم قبل أن توقّع.",
   steps: ["الرسالة", "الفهم", "التحقق", "التوقيع", "تم"],
   folder: "ملف العائلة",
-  folderEmptyHint: "",
   intakeTitle: "1. ماذا أرسلت المدرسة؟",
   schoolName: "اسم المدرسة",
   schoolNamePh: "مثال: مدرسة لينكولن",
@@ -336,6 +339,8 @@ const ar: UiStrings = {
   photoErrRead: "لم نتمكن من قراءة الرسالة.",
   photoErrGeneric: "حدث خطأ ما.",
   explainBtn: "اشرح هذه الرسالة →",
+  privacyNote:
+    "تُ حفظ إيصالاتك الموقعة ومجلد عائلتك في هذا المتصفح — بلا حساب ولا قاعدة بيانات. لشرح رسالة، يُرسَل نصها إلى خدمة ذكاء اصطناعي ولا يقوم سابي بتخزينه. استخدم الرسائل النموذجية إذا أردت ألا يخرج أي شيء من جهازك.",
   stage1: "نقرأ الرسالة…",
   stage2: "نجهّز شرحك…",
   stage3: "على وشك الانتهاء…",
