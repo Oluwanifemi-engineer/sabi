@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { clientFromEnv } from "@/lib/llm";
 import { REPLY_SYSTEM_PROMPT, languageName } from "@/lib/prompts";
+import { rateLimitOrResponse } from "@/lib/rate-limit";
 import type { LlmMessage } from "@/lib/llm";
 import type { LanguageCode } from "@/lib/types";
 
@@ -19,6 +20,9 @@ const DEMO_REPLY_SIGNED = `Hello, thank you for the letter about my child. I hav
 const DEMO_REPLY_UNSIGNED = `Hello, thank you for the letter about my child. I received it and I understand what you are asking. I have some questions first, written below, before I decide. Please answer me or call with an interpreter. I would also like all future letters in my language.`;
 
 export async function POST(request: Request) {
+  const limited = rateLimitOrResponse(request);
+  if (limited) return limited;
+
   let body: ReplyBody;
   try {
     body = (await request.json()) as ReplyBody;

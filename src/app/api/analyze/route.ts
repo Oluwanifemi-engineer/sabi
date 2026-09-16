@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { clientFromEnv, extractJson, type LlmMessage } from "@/lib/llm";
 import { ANALYZE_SYSTEM_PROMPT, languageName } from "@/lib/prompts";
 import { mockExplain } from "@/lib/mock";
+import { rateLimitOrResponse } from "@/lib/rate-limit";
 import type { Analysis, Explanation, LanguageCode, QuizQuestion } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -29,6 +30,9 @@ function normalize(raw: unknown): { analysis: Analysis; explanation: Explanation
 }
 
 export async function POST(request: Request) {
+  const limited = rateLimitOrResponse(request);
+  if (limited) return limited;
+
   let body: AnalyzeBody;
   try {
     body = (await request.json()) as AnalyzeBody;

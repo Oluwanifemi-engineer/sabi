@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { clientFromEnv, extractJson, type LlmMessage } from "@/lib/llm";
 import { SIMPLIFY_SYSTEM_PROMPT } from "@/lib/prompts";
 import { mockSimplify } from "@/lib/mock";
+import { rateLimitOrResponse } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -12,6 +13,9 @@ interface SimplifyBody {
 }
 
 export async function POST(request: Request) {
+  const limited = rateLimitOrResponse(request);
+  if (limited) return limited;
+
   let body: SimplifyBody;
   try {
     body = (await request.json()) as SimplifyBody;

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { SAMPLE_LETTERS } from "@/lib/samples";
 import { clientFromEnv } from "@/lib/llm";
+import { rateLimitOrResponse } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -22,6 +23,9 @@ interface OcrBody {
  * different model for images (defaults to LLM_MODEL or gpt-4o-mini).
  */
 export async function POST(request: Request) {
+  const limited = rateLimitOrResponse(request);
+  if (limited) return limited;
+
   try {
     const body = (await request.json()) as OcrBody;
     if (!body.image) {
