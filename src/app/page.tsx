@@ -277,7 +277,10 @@ export default function Home() {
   const rtl = langMeta?.rtl ? "rtl" : "ltr";
 
   return (
-    <main className="mx-auto max-w-3xl px-5 pb-24">
+    // Direction at the root so every screen inherits it — the intake and
+    // signing steps were rendering left-to-right for Arabic parents while only
+    // the explanation and quiz cards flipped.
+    <main className="mx-auto max-w-3xl px-5 pb-24" dir={rtl}>
       {/* Header */}
       <header className="pt-10 pb-6 flex items-start justify-between gap-4">
         <div>
@@ -333,7 +336,7 @@ export default function Home() {
               style={photoMode ? { borderColor: "var(--teal)", background: "color-mix(in srgb, var(--teal) 12%, white)" } : undefined}
               onClick={() => { setPhotoMode((v) => !v); setError(null); }}
             >
-              📷 {photoMode ? "Paste instead" : "Take a photo"}
+              {photoMode ? t.photoPaste : t.photoTake}
             </button>
           </div>
           <div>
@@ -351,6 +354,16 @@ export default function Home() {
           </div>
           {photoMode ? (
             <PhotoIntake
+              labels={{
+                title: t.photoTitle,
+                hint: t.photoHint,
+                reading: t.photoReading,
+                retake: t.photoRetake,
+                alt: t.photoAlt,
+                errSelect: t.photoErrSelect,
+                errRead: t.photoErrRead,
+                errGeneric: t.photoErrGeneric,
+              }}
               onExtracted={(text) => {
                 setLetterText(text);
                 setPhotoMode(false);
