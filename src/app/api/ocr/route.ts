@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { SAMPLE_LETTERS } from "@/lib/samples";
-import { clientFromEnv } from "@/lib/llm";
 import { rateLimitOrResponse } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
@@ -14,41 +13,46 @@ interface OcrBody {
 /**
  * POST /api/ocr — extract text from a photographed school letter.
  *
- * Demo mode (no LLM_API_KEY): returns a realistic sample letter so the
- * full camera → OCR → explain flow is demoable without any external key.
+ * Live OCR requires LLM_VISION_MODEL to be set explicitly. That is deliberate:
+ * a text-only model cannot read a photo, and defaulting to some vendor's vision
+ * model name would fail on every single request against a provider that does
+ * not host it. With no vision model configured we fall back to a realistic
+ * sample extraction so the camera → explain flow stays demoable.
  *
- * Live mode: sends the image to a vision-capable model (gpt-4o, gemini-1.5,
- * claude-3.5, etc.) via the same OpenAI-compatible client the rest of the
- * app uses. Set LLM_VISION_MODEL in .env.local if your provider needs a
- * different model for images (defaults to LLM_MODEL or gpt-4o-mini).
+ * Failures return 502 with a message a parent can act on, never a raw error.
  */
 export async function POST(request: Request) {
   const limited = rateLimitOrResponse(request);
   if (limited) return limited;
 
+  let body: OcrBody;
   try {
-    const body = (await request.json()) as OcrBody;
-    if (!body.image) {
-      return NextResponse.json({ error: "No image provided." }, { status: 400 });
-    }
+    body = (await request.json()) as OcrBody;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
 
-    const client = clientFromEnv();
+  if (!body.image) {
+    return NextResponse.json({ error: "No image provided." }, { status: 400 });
+  }
 
-    // ── Demo mode: return a sample letter as "extracted" text ──────────
-    if (!client) {
-      const sample = SAMPLE_LETTERS[Math.floor(Math.random() * SAMPLE_LETTERS.length)];
-      // Simulate a brief OCR delay so the UI loading state is visible
-      await new Promise((r) => setTimeout(r, 1200));
-      return NextResponse.json({ text: sample.text });
-    }
+  const apiKey = process.env.LLM_API_KEY;
+  const visionModel = process.env.LLM_VISION_MODEL;
 
-    // ── Live mode: send image to a vision-capable LLM ─────────────────
-    // The minimal client in lib/llm.ts only sends string content, so the
-    // multimodal payload is built by hand here — same env vars, same endpoint.
-    const apiKey = process.env.LLM_API_KEY;
-    const baseUrl = (process.env.LLM_BASE_URL ?? "https://api.openai.com/v1").replace(/\/$/, "");
-    const model = process.env.LLM_VISION_MODEL ?? process.env.LLM_MODEL ?? "gpt-4o-mini";
+  // ── Demo extraction: no key, or the provider has no vision model ──────
+  if (!apiKey || !visionModel) {
+    const sample = SAMPLE_LETTERS[Math.floor(Math.random() * SAMPLE_LETTERS.length)];
+    // Brief delay so the UI loading state is visible.
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    return NextResponse.json({ text: sample.text, engine: "demo" });
+  }
 
+  // ── Live vision ──────────────────────────────────────────────────────
+  // The minimal client in lib/llm.ts only sends string content, so the
+  // multimodal payload is built by hand here — same env vars, same endpoint.
+  const baseUrl = (process.env.LLM_BASE_URL ?? "https://api.openai.com/v1").replace(/\/$/, "");
+
+  try {
     const response = await fetch(`${baseUrl}/chat/completions`, {
       method: "POST",
       headers: {
@@ -56,7 +60,7 @@ export async function POST(request: Request) {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model,
+        model: visionModel,
         messages: [
           { role: "system", content: OCR_SYSTEM },
           {
@@ -74,18 +78,34 @@ export async function POST(request: Request) {
 
     if (!response.ok) {
       const detail = await response.text().catch(() => "");
-      throw new Error(`Vision API failed (${response.status}): ${detail.slice(0, 200)}`);
+      console.error(`Vision OCR failed (${response.status}): ${detail.slice(0, 200)}`);
+      return NextResponse.json(
+        {
+          error:
+            "We could not read that photo. Please try again with better light and the whole page in frame, or type the letter instead.",
+        },
+        { status: 502 }
+      );
     }
 
     const data = (await response.json()) as { choices?: { message?: { content?: string } }[] };
     const text = data.choices?.[0]?.message?.content;
-    if (!text) throw new Error("Vision model returned no text.");
+    if (!text) {
+      return NextResponse.json(
+        { error: "We could not read any text in that photo. Please type the letter instead." },
+        { status: 502 }
+      );
+    }
 
-    return NextResponse.json({ text: text.trim() });
-  } catch (e) {
+    return NextResponse.json({ text: text.trim(), engine: "vision" });
+  } catch (error) {
+    console.error("Vision OCR request failed:", error);
     return NextResponse.json(
-      { error: e instanceof Error ? e.message : "OCR failed." },
-      { status: 500 }
+      {
+        error:
+          "We could not read that photo. Please try again with better light and the whole page in frame, or type the letter instead.",
+      },
+      { status: 502 }
     );
   }
 }
