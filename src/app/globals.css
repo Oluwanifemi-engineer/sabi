@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #faf6f0;
+  --ink: #26211b;
+  --teal: #0d7a6f;
+  --teal-deep: #0a5d55;
+  --amber: #e8a13a;
+  --coral: #d4593f;
+  --card: #ffffff;
+  --line: #e4dccf;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: ui-rounded, "Nunito", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.font-display {
+  font-family: ui-rounded, "Nunito", "Segoe UI", system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 2px rgb(38 33 27 / 0.04), 0 8px 24px rgb(38 33 27 / 0.06);
+}
+
+.btn-primary {
+  background: var(--teal);
+  color: #fff;
+  border-radius: 9999px;
+  padding: 0.8rem 1.6rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+.btn-primary:hover {
+  background: var(--teal-deep);
+}
+.btn-primary:active {
+  transform: scale(0.98);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  border: 2px solid var(--line);
+  border-radius: 9999px;
+  padding: 0.7rem 1.4rem;
+  font-weight: 600;
+  transition: border-color 0.15s ease;
+}
+.btn-ghost:hover {
+  border-color: var(--teal);
+}
+
+textarea,
+input,
+select {
+  font-size: 1rem;
+}
+textarea:focus,
+input:focus,
+select:focus {
+  outline: 3px solid color-mix(in srgb, var(--teal) 35%, transparent);
+  outline-offset: 1px;
+}
+
+.step-dot {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  background: var(--line);
+  color: var(--ink);
+}
+.step-dot.active {
+  background: var(--teal);
+  color: #fff;
+}
+.step-dot.done {
+  background: color-mix(in srgb, var(--teal) 25%, white);
+  color: var(--teal-deep);
+}
+
+.sig-pad {
+  touch-action: none;
+  border: 2px dashed var(--line);
+  border-radius: 1rem;
+  background: #fffdf9;
+  cursor: crosshair;
+}
+
+.fade-in {
+  animation: fadeIn 0.35s ease both;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.speaking-dot {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 9999px;
+  background: var(--coral);
+  animation: pulse 1s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.75);
+  }
+}
