@@ -8,6 +8,9 @@ export const runtime = "nodejs";
 
 interface SimplifyBody {
   letterType?: string;
+  /** The letter itself. Without it the model can only guess at the content. */
+  letterText?: string;
+  keyFacts?: string[];
   failedQuestions?: string[];
   language?: string;
 }
@@ -30,11 +33,19 @@ export async function POST(request: Request) {
   }
 
   try {
+    const facts = (body.keyFacts ?? []).filter(Boolean).slice(0, 6);
+    const letter = (body.letterText ?? "").trim().slice(0, 2000);
     const messages: LlmMessage[] = [
       { role: "system", content: SIMPLIFY_SYSTEM_PROMPT },
       {
         role: "user",
-        content: `Letter type: ${body.letterType ?? "generic"}\nParent's language: ${body.language ?? "es"}\nQuestions answered wrong:\n${failed.map((q, i) => `${i + 1}. ${q}`).join("\n") || "(none provided)"}`,
+        content: [
+          `Letter type: ${body.letterType ?? "generic"}`,
+          `Parent's language: ${body.language ?? "es"}`,
+          `What the letter asks (key facts):\n${facts.length ? facts.map((f) => `- ${f}`).join("\n") : "(not provided)"}`,
+          `Original letter text:\n${letter || "(not provided)"}`,
+          `Questions answered wrong:\n${failed.map((q, i) => `${i + 1}. ${q}`).join("\n") || "(none provided)"}`,
+        ].join("\n\n"),
       },
     ];
     const raw = await client.complete(messages, { temperature: 0.3 });

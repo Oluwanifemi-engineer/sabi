@@ -151,7 +151,13 @@ export default function Home() {
         const res = await fetch("/api/simplify", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ letterType: result.analysis.type, failedQuestions: failedTexts, language }),
+          body: JSON.stringify({
+          letterType: result.analysis.type,
+          letterText,
+          keyFacts: result.analysis.keyFacts,
+          failedQuestions: failedTexts,
+          language,
+        }),
         });
         const data = (await res.json()) as { simpler?: { headline: string; bullets: string[]; aboutWrong: string[] } };
         setSimpler(data.simpler ?? null);
